@@ -1,0 +1,91 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: One Lambda to rule them all
+
+Globals:
+  Api:
+    Cors:
+      AllowMethods: "'GET,POST,OPTIONS'"
+      AllowHeaders: "'content-type'"
+      AllowOrigin: "'*'"
+      AllowCredentials: "'*'"
+
+Resources:
+  DynamoDBTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "key"
+          AttributeType: "S"
+        - AttributeName: "scope"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "key"  # Partition key
+          KeyType: "HASH"
+        - AttributeName: "scope"  # Sort key
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: true
+      TableName: "lambdaOneRequests"
+
+  LambdaOneFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ONE
+      CodeUri: lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Timeout: 3
+      MemorySize: 512
+      Policies:
+        - AmazonDynamoDBFullAccess
+        - AmazonPollyFullAccess
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 'polly:SynthesizeSpeech'
+              Resource: '*'
+            - Effect: Allow
+              Action:
+                - logs:*
+              Resource: arn:aws:logs:*:*:*
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: '*'
+      Events:
+        GetEvent:
+          Type: Api
+          Properties:
+            Path: /ui/{filename}
+            Method: get
+        PostEvent:
+          Type: Api
+          Properties:
+            Path: /{function}
+            Method: post
+        UpdateSchedule:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+            Input: '{"req":"poll"}'
+  LogsLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${LambdaOneFunction}'
+      RetentionInDays: 7
+
+Outputs:
+  LambdaOneApi:
+    Description: "Prod stage API Gateway endpoint URL for LambdaOne"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/{function}"
+  LambdaOneFunction:
+    Description: "LambdaOne Function ARN"
+    Value: !GetAtt LambdaOneFunction.Arn
+  LambdaOneIamRole:
+    Description: "Implicit IAM Role created for LambdaOne"
+    Value: !GetAtt LambdaOneFunction.Arn

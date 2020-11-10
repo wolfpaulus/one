@@ -1,0 +1,9 @@
+POST https://le95wslzi8.execute-api.us-west-2.amazonaws.com/Prod/synthesize
+Content-Type: application/json
+
+{
+  "scope" : "awscd",
+  "text" : "Hello Tom",
+  "translate": "False",
+  "format" : "mp3"
+}

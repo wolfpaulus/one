@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Speech Synthesizer</title>
+    <link rel="icon" href="https://wolfpaulus.com/wp-content/uploads/2016/12/cropped-wp512-32x32.jpg" sizes="32x32"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="./style.css"/>
+    <script type="text/javascript" src="./script.js"></script>
+</head>
+<body>
+
+<h1><i class="material-icons">hearing</i> Synthesize it ...</h1>
+<form spellcheck="true">
+    <textarea id='ta'>The quick brown fox</textarea>
+    <div class="switch-field">
+        <input type="checkbox" id="translate"/>
+        <label for="translate">Translate to German</label> | Output format:
+        <input type="radio" id="fmt_mp3" name="format-switch" value="mp3" checked/>
+        <label for="fmt_mp3">MP3</label>
+        <input type="radio" id="fmt_wav" name="format-switch" value="wav"/>
+        <label for="fmt_wav">WAV</label>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;
+        <button type="button" id="submit" onclick="submitform();">Submit</button>
+    </div>
+</form>
+<p></p>
+<div>
+    <audio id="player" controls="controls" preload="auto"></audio>
+</div>
+<hr/>
+<small>&copy 2021 <a href="mailto:wolf@paulus.com">wolf@paulus.com</a></small>
+</body>
+</html>
