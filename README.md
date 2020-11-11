@@ -27,6 +27,6 @@ In summary, here is what the Lambda function will do:
 - Return the base64 encoded binary data to the requesting HTML page for consumption
 
 A detailed documentation about this projeect can be found here:
-[https://wolfpaulus.com/one-lambda-to-rule-them-all/](https://wolfpaulus.com/one-lambda-to-rule-them-all/)
+[https://wolfpaulus.com/one-lambda/](https://wolfpaulus.com/one-lambda/)
 
 <img src="https://wolfpaulus.com/wp-content/uploads/2020/12/allone-1536x870.jpg">
