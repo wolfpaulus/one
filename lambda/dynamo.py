@@ -23,7 +23,7 @@ class RequestDB:
             cls.table = cls.dynamodb.Table(cls.TABLE_NAME)
 
     @classmethod
-    def _create_key(self):
+    def _create_key(cls):
         """
         Look here, for creating a UUID using Python in Lambda and storing this in elasticache:
         https://stackoverflow.com/questions/35625658/aws-lambda-w-python-uuid-on-dynamo-db-concept

@@ -11,8 +11,8 @@ import logging
 from os import chmod
 from shutil import copyfile
 
-from polly import synthesize
 from dynamo import RequestDB
+from polly import synthesize
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -23,10 +23,11 @@ chmod("/tmp/ffmpeg", 755)
 RequestDB.init("dynamodb")
 SCOPE = "awscd"
 
+
 def lambda_handler(event, context) -> dict:
     """
     :param event: input data, usually a dict, but can also be list, str, int, float, or NoneType type.
-    :param context: object w/ methods a. properties providing info about invocation, function, and execution environment
+    :param context: object providing information about invocation, function, and execution environment
     :return: dict with http header, status code, and body
     """
     if not event.get('httpMethod'):  # invoked directly e.g. to keep it warm
@@ -34,7 +35,7 @@ def lambda_handler(event, context) -> dict:
 
     status_code, content_type, content = get(event['path']) if 'GET' == event['httpMethod'] else post(event)
     return {
-        "statusCode": 200,
+        "statusCode": status_code,
         "headers": {
             # Cross-Origin Resource Sharing (CORS) allows a server to indicate any other origins than its own,
             # from which a browser should permit loading of resources.
@@ -48,30 +49,24 @@ def lambda_handler(event, context) -> dict:
 
 
 def get(file_path: str) -> (int, str, str):
-    """
-    :return: content of the requested text file.
-    """
+    """ :returns: HTTP code, content-type, content of the requested text file. API Gateway is blocking all but /ui/* """
     logging.info(file_path)
 
-    if not file_path.startswith('/ui/'):
-        file_path = '/ui/index.html'
     if file_path.endswith('.css'):
         content_type = 'text/css; charset=UTF-8'
     elif file_path.endswith('.js'):
         content_type = 'text/javascript; charset=UTF-8'
     else:
         content_type = 'text/html; charset=UTF-8'
-        file_path = '/ui/index.html'
     try:
         with open('.' + file_path, 'r') as file:
             content = file.read()
-    except:
-        content_type = 'text/html; charset=UTF-8'
-        content = file_path
+    except OSError:
+        return 404, 'text/html; charset=UTF-8', file_path + " not found"
     return 200, content_type, content
 
 
-def post(event: dict) -> (int, (str, str, str)):
+def post(event: dict) -> (int, str, str):
     """ :returns HTTP code, content-type, and message """
     params = json.loads(event['body'])  # if event.get('body') else event
     if params:

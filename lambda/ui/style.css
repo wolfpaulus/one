@@ -24,13 +24,19 @@ textarea {
     font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif !important
 }
 
+
 hr {
-    margin-top: 50px
+    border: 0;
+    height: 1px;
+    background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 119, 197, 0.75), rgba(0, 0, 0, 0));
 }
 
-small {
-    color: #124653;
-    font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif !important
+
+.footer {
+    font-family: "Avenir Next", "Helvetica Neue", Helvetica, sans-serif !important;
+    font-size: 12px;
+    color: #0077C5;
+    text-decoration: none;
 }
 
 a {

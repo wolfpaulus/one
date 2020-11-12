@@ -11,24 +11,15 @@ logger.setLevel(logging.INFO)
 
 def synthesize(text: str = "", translate: bool = False, fmt='mp3') -> str:
     """ Synthesize the provided text to base64 encoded mp3
-    Sample code: https://github.com/awsdocs/aws-doc-sdk-examples/tree/master/python/example_code/polly
-    API: https://docs.aws.amazon.com/polly/latest/dg/API_SynthesizeSpeech.html
     :param text: text to be synthesized
     :param translate: bool needs to be translated into German
     :param fmt: 'wav' or 'mp3'
-    :return: bytes .. base64 encoded wav or mp3 file
+    :return: string, the base64 encoded bytes or a wav or mp3 file
     """
-    polly_client = client("polly")
-    if translate:
-        text = to_german(text)
-    if not text.startswith("<speak"):
-        text = f"<speak>{text}</speak>"
-
-    response = polly_client.synthesize_speech(Engine="standard" if translate else "neural",
-                                              VoiceId="Vicki" if translate else "Joanna",  # or Marlene or Hans
-                                              OutputFormat="mp3",
-                                              Text=text,
-                                              TextType="ssml")
+    response = client("polly").synthesize_speech(Engine="standard" if translate else "neural",
+                                                 VoiceId="Marlene" if translate else "Joanna",
+                                                 Text=to_german(text) if translate else text,
+                                                 OutputFormat="mp3")
     binary_data = response["AudioStream"].read()
     return base64.b64encode(mpeg2wav(binary_data) if fmt == 'wav' else binary_data).decode("utf-8")
 
@@ -38,13 +29,13 @@ def to_german(english: str) -> str:
     Calling our translate lambda function
     doc: https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/lambda.html
     """
-    response_from_lambda = client('lambda').invoke(
+    response = client('lambda').invoke(
         FunctionName='EN2DE',
         InvocationType='RequestResponse',
         Payload=bytes(json.dumps({'text': english}), encoding='utf8')
     )
-    logger.info(str(response_from_lambda))
-    response = json.load(response_from_lambda['Payload'])
+    logger.info(str(response))
+    response = json.load(response['Payload'])
     return response.get('TranslatedText')
 
 
